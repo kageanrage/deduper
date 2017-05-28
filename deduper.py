@@ -13,19 +13,19 @@
 import os
 
 # directory = str(sys.argv[1])  # takes the desired directory from the command line argument, passed by the batch file
-directory = r"C:\KP Python\Movie deduper\test"
+directory = r"C:\KP Python\deduper\test"
 
 os.chdir(directory) # change cwd to the desired directory
 abspath = os.path.abspath('.')  # define abspath
 
 
-def get_video_filename_and_size(fname, folname):
+def get_video_filename(fname, folname):
     movie_extensions = ['.mov', '.mp4', '.mkv']
     basename, ext = os.path.splitext(fname) # isolate basename and extensions
     if ext in movie_extensions:
         # print('Movie file detected in {}: {}'.format(folname, fname))
         fname_with_path = os.path.join(abspath, folname, fname)    # new name incl path
-        return fname, os.path.getsize(fname_with_path)
+        return fname_with_path
 
 for folderName, subfolders, filenames in os.walk(directory):
     # print('The current folder is ' + folderName)
@@ -34,26 +34,22 @@ for folderName, subfolders, filenames in os.walk(directory):
     movie_files_detected = []
     for filename in filenames:
     #   print('FILE INSIDE ' + folderName + ': ' + filename)
-        if get_video_filename_and_size(filename, folderName) != None:
-            movie_files_detected.append(get_video_filename_and_size(filename, folderName))
-        # print('Base name is {} and extension is {}'.format(basename, ext))
-    if len(movie_files_detected) > 0:
-        print('Movie files detected in {} = {}'.format(folderName, movie_files_detected))
-    # TO DO: determine largest video file
-    for name_size_pair in movie_files_detected:
-        name = name_size_pair[0]
-        size = name_size_pair[1]
-        print('Name = {} and size = {}'.format(name, size))
-        # hmmm... how do I now compare the size in each tuple to find the largest? there is a list command but
-        #  these aren't in a list. Could try using a for loop to cycle through each and compare?
-
-
-#  for filename in os.listdir(os.getcwd()):
-
-# code to list base names and extensions
-
-
-
-
-
-
+        if get_video_filename(filename, folderName) != None:
+            movie_files_detected.append(get_video_filename(filename, folderName))
+    # TO DO: sort and print video files
+    fname_sorted = sorted(movie_files_detected, key=os.path.getsize, reverse=True)
+    for item in fname_sorted:
+        print('item is {}, size is {}'.format(item, os.path.getsize(item)))
+    # TO DO: print video files which can be deleted
+    if len(fname_sorted) >= 1:
+        print('Multiple video files detected.')
+        print('Potential files to delete are as follows:')
+        for i in range(1, len(fname_sorted)):
+            print('File to delete is {}, size is {}'.format(fname_sorted[i], os.path.getsize(fname_sorted[i])))
+        for i in range(1, len(fname_sorted)):
+            response = input('Press Y to delete or N to ignore: {}, size is {}'.format(fname_sorted[i], os.path.getsize(fname_sorted[i])))
+            response.upper()
+            if response == 'Y':
+                print('Pretending to delte file: {}'.format(fname_sorted[i])) # INSERT CODE TO DELETE FILE
+            else:
+                continue
