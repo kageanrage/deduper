@@ -45,7 +45,7 @@ for folderName, subfolders, filenames in os.walk(directory):
         if get_video_filename(filename, folderName) != None:
             movie_files_detected.append(get_video_filename(filename, folderName))
     fname_sorted = sorted(movie_files_detected, key=os.path.getsize, reverse=True)
-    if len(fname_sorted) >= 1:
+    if len(fname_sorted) > 1:
         print('Multiple video files detected in folder {}'.format(folderName))
         print("The largest video file in the folder, which we won't touch, is {}\n".format(fname_sorted[0]))
         print('Potential files to delete are as follows:')
