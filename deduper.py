@@ -3,7 +3,7 @@
 # the largest of the files found in each directory
 
 # TO DO:
-# Use what's in the entry box to set Directory variable
+# Use what's in the entry box to set Directory variable - fix current bug
 # adjust sizing (window, entry box, buttons etc)
 # show all text on GUI instead of in command prompt / console
 # add 'Clear' button to reset Directory field
@@ -30,6 +30,11 @@ def set_directory():
     return dir
 
 
+def set_dir_from_gui():    # this isn't working because returning newdir isn't enough - I need to change it
+    new_dir = entryDir.get()
+    print('Attempting to set new dir')
+    return new_dir
+
 def get_video_filename(fname, folname, abspath):
     movie_extensions = ['.mov', '.mp4', '.mkv', '.avi']
     basename, ext = os.path.splitext(fname) # isolate basename and extensions
@@ -38,8 +43,9 @@ def get_video_filename(fname, folname, abspath):
         fname_with_path = os.path.join(abspath, folname, fname)    # new name incl path
         return fname_with_path
 
+
 def main_fn():
-    directory = set_directory()
+    print('Directory = {}'.format(directory))
     os.chdir(directory) # change cwd to the desired directory
     abspath = os.path.abspath('.')  # define abspath
     for folderName, subfolders, filenames in os.walk(directory):
@@ -72,17 +78,25 @@ def main_fn():
 print('Hello, this script will crawl through the directory and sub-dirs, notify if multiple video files found in one '
       'dir, and prompt to delete each of them, excluding the largest one\n\n\n')
 
+directory = set_directory()
+dir_text = str(directory)   # converts directory path to text for use by tkinter 'entryDir' as default text
+
 # TKINTER SECTION
 root = Tk()
 root.title('Deduper')
 
-labelFirst = Label(root,text='Directory').grid(row=2,column=1)
-firstEntry = Entry(root)
-firstEntry.insert(10, r"C:\KP Python\deduper\test")
-firstEntry.grid(row=2,column=5)
+labelHeading = Label(root, text='Deduper').grid(row=0, column=2)
+labelDescription = Label(root, text='Deletes all but the largest video file in each sub-dir').grid(row=1, column=2)
+
+labelDir = Label(root, text='Directory').grid(row=2, column=1)
+entryDir = Entry(root, width=50)
+entryDir.insert(10, dir_text)
+entryDir.grid(row=2,column=2)
+
 
 quitButton = Button(root,text='Quit',command=quit).grid(row=4,column=1)
-goButton = Button(root,text='Go',command=main_fn).grid(row=4,column=2)
+setDirButton = Button(root, text='Set Dir', command=set_dir_from_gui).grid(row=4, column=2)
+goButton = Button(root,text='Go',command=main_fn).grid(row=4,column=3)
 mainloop()
 
 
