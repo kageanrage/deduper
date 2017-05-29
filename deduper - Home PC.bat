@@ -1,0 +1,1 @@
+@python.exe "C:\Github local repos\deduper\deduper.py" "C:\Github local repos\deduper\test" %*

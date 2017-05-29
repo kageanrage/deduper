@@ -1,0 +1,1 @@
+@"C:\Program Files\Python35\python.exe" "C:\KP Python\deduper\deduper.py" "C:\KP Python\deduper\test" %*
