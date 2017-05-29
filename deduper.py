@@ -62,3 +62,8 @@ for folderName, subfolders, filenames in os.walk(directory):
                     print('Pretending to delete file: {}'.format(fname_sorted[i])) # INSERT CODE TO DELETE FILE
             else:
                 continue
+
+q = input('Press Q to quit\n')
+q = q.upper()
+if q == 'Q':
+    sys.exit()
