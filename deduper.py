@@ -8,7 +8,7 @@ import send2trash
 import sys
 
 
-Test_mode = True
+Test_mode = False
 
 def set_directory():
     if len(sys.argv) > 1:
