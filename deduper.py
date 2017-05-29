@@ -8,7 +8,7 @@ import send2trash
 import sys
 
 
-Test_mode = False
+Test_mode = True
 
 def set_directory():
     if len(sys.argv) > 1:
@@ -24,7 +24,7 @@ def set_directory():
 
 
 def get_video_filename(fname, folname):
-    movie_extensions = ['.mov', '.mp4', '.mkv']
+    movie_extensions = ['.mov', '.mp4', '.mkv', '.avi']
     basename, ext = os.path.splitext(fname) # isolate basename and extensions
     if ext in movie_extensions:
         # print('Movie file detected in {}: {}'.format(folname, fname))
