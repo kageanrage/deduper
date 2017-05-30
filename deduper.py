@@ -10,6 +10,7 @@ import os
 import send2trash
 import sys
 from tkinter import *
+from random import randint
 
 Test_mode = True
 
@@ -101,6 +102,19 @@ dir_text = str(directory)   # converts directory path to text for use by tkinter
 # TKINTER SECTION
 root = Tk()
 root.title('Deduper')
+
+
+#### This little section experiments with adding text box console to GUI  #####
+def generate_text():
+    txt = 'A random number between 1 and 10 is {}\n'.format(randint(1,10))
+    tex.insert(END, txt)
+    tex.see(END)
+
+tex = Text(root, height=30, width=120)
+tex.grid(row=5, column=2)
+b = Button(root, text='Show text', command=generate_text).grid(row=4, column=2)
+#########################################################################
+
 
 labelHeading = Label(root, text='Deduper', font = 'Arial 24 bold', fg='blue', bg='gray').grid(row=0, column=2)
 labelDescription = Label(root, text='Deletes all but the largest video file in each sub-dir', font='Arial 16', fg='blue', bg='gray').grid(row=1, column=2)
