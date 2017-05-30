@@ -10,7 +10,6 @@ import os
 import send2trash
 import sys
 from tkinter import *
-from random import randint
 
 Test_mode = True
 
@@ -93,27 +92,24 @@ def main_triggered_from_button():
     enable_dir_set_by_button()
     main_fn()
 
-print('Hello, this script will crawl through the directory and sub-dirs, notify if multiple video files found in one '
-      'dir, and prompt to delete each of them, excluding the largest one\n\n\n')
+
+def output(text):
+    text_box.insert(END, '{}\n'.format(text))
+    text_box.see(END)    # not sure if this updates the text, or tells the text box to scroll if needed
+    print(text)
 
 directory = tell_me_which_directory()
 dir_text = str(directory)   # converts directory path to text for use by tkinter 'entryDir' as default text
+
 
 # TKINTER SECTION
 root = Tk()
 root.title('Deduper')
 
 
-#### This little section experiments with adding text box console to GUI  #####
-def generate_text():
-    txt = 'A random number between 1 and 10 is {}\n'.format(randint(1,10))
-    tex.insert(END, txt)
-    tex.see(END)
-
-tex = Text(root, height=30, width=120)
-tex.grid(row=5, column=2)
-b = Button(root, text='Show text', command=generate_text).grid(row=4, column=2)
-#########################################################################
+text_box = Text(root, height=30, width=120)
+text_box.grid(row=5, column=2)
+b = Button(root, text='Show text').grid(row=4, column=2)
 
 
 labelHeading = Label(root, text='Deduper', font = 'Arial 24 bold', fg='blue', bg='gray').grid(row=0, column=2)
@@ -127,9 +123,9 @@ entryDir.grid(row=2,column=2)
 
 quitButton = Button(root,text='Quit', font='Arial 16',command=quit, fg='red', bg='gray').grid(row=4,column=1)
 goButton = Button(root,text='Go', font='Arial 24 bold',command=main_triggered_from_button, fg='green', bg='gray').grid(row=4,column=3)
+
+print('Hello, this script will crawl through the directory and sub-dirs, notify if multiple video files found in one '
+'dir, and prompt to delete each of them, excluding the largest one\n\n\n')
+
 mainloop()
-
-
-# PRESS Q TO QUIT
-
 
