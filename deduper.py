@@ -2,10 +2,16 @@
 # Deduper.py - Script to crawl through Movies directory, notify if multiple video files and prompt to delete all but
 # the largest of the files found in each directory
 
+# State of this program - the GUI is only useful to select input directory - it doesn't then give any further control
+# and it seizes up, with control handled by the command prompt. Probably worthwhile continuing to try to solve, although
+# will mean that main_fn will need to be duplicated / overhauled so it can be controlled in an object oriented fashion.
+# I've tested outputting text to the GUI and it works fine - I need to work out how to run my program in bursts by pressing
+# buttons (which trigger functions - e.g. 'delete and show next file') instead of using console input
+
+
 # TO DO:
-# can I refactor to put a lot of the GUI creation inside a function? Or in a class, ultimately in a separate file?
-# show all text on GUI (using Output function) instead of in command prompt / console.
-    # this will require the ability to use buttons for 'Yes' or 'No' instead of command prompt. Duplicate 'Main fn'?
+# show all text on GUI (using Output function) instead of in command prompt / console - this will require the ability
+#  to use buttons for 'Yes' or 'No' instead of command prompt
 
 
 import os
@@ -39,7 +45,7 @@ def tell_me_which_directory():
 
 
 def get_dir_from_gui():
-    new_dir = entryDir.get()
+    new_dir = gui.entryDir.get()
     print('Attempting to set new dir')
     return new_dir
 
@@ -95,11 +101,28 @@ def main_triggered_from_button():
     main_fn()
 
 
-def output(text):
-    text_box.insert(END, '{}\n'.format(text))
-    text_box.see(END)    # not sure if this updates the text, or tells the text box to scroll if needed
-    print(text)
+class Gui:
+    def __init__(self, root):
+        self.text_box = Text(root, height=30, width=120)
+        self.text_box.grid(row=5, column=2)
 
+        self.labelHeading = Label(root, text='Deduper', font = 'Arial 24 bold', fg='blue', bg='gray').grid(row=0, column=2)
+        self.labelDescription = Label(root, text='Deletes all but the largest video file in each sub-dir', font='Arial 16', fg='blue', bg='gray').grid(row=1, column=2)
+
+        self.labelDir = Label(root, text='Directory', font='Arial 16', fg='blue', bg='gray').grid(row=2, column=1)
+        self.entryDir = Entry(root, width=50)
+        self.entryDir.insert(10, dir_text)
+        self.entryDir.grid(row=2,column=2)
+
+        self.quitButton = Button(root,text='Quit', font='Arial 16',command=quit, fg='red', bg='gray').grid(row=4,column=1)
+        self.goButton = Button(root,text='Go', font='Arial 24 bold',command=main_triggered_from_button, fg='green', bg='gray').grid(row=4,column=3)
+
+
+    def output(self, text):
+        self.text_box.insert(END, '{}\n'.format(text))
+        self.text_box.see(END)    # not sure if this updates the text, or tells the text box to scroll if needed
+        print('Attempting to OUTPUT: {}\n'.format(text))
+        print(text)
 
 
 print('Hello, this script will crawl through the directory and sub-dirs, notify if multiple video files found in one '
@@ -108,24 +131,7 @@ print('Hello, this script will crawl through the directory and sub-dirs, notify 
 directory = tell_me_which_directory()
 dir_text = str(directory)   # converts directory path to text for use by tkinter 'entryDir' as default text
 
-# TKINTER SECTION
-root = Tk()
-root.title('Deduper')
+root = Tk().title('Deduper')
+gui = Gui(root)
 
-text_box = Text(root, height=30, width=120)
-text_box.grid(row=5, column=2)
-
-labelHeading = Label(root, text='Deduper', font = 'Arial 24 bold', fg='blue', bg='gray').grid(row=0, column=2)
-labelDescription = Label(root, text='Deletes all but the largest video file in each sub-dir', font='Arial 16', fg='blue', bg='gray').grid(row=1, column=2)
-
-labelDir = Label(root, text='Directory', font='Arial 16', fg='blue', bg='gray').grid(row=2, column=1)
-entryDir = Entry(root, width=50)
-entryDir.insert(10, dir_text)
-entryDir.grid(row=2,column=2)
-
-quitButton = Button(root,text='Quit', font='Arial 16',command=quit, fg='red', bg='gray').grid(row=4,column=1)
-goButton = Button(root,text='Go', font='Arial 24 bold',command=main_triggered_from_button, fg='green', bg='gray').grid(row=4,column=3)
 mainloop()
-
-
-# PRESS Q TO QUIT
