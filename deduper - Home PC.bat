@@ -1,1 +1,0 @@
-@python.exe "C:\Github local repos\deduper\deduper.py" "H:\Downloads\Server Downloads\Complete\Movies" %*
