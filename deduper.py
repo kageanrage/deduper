@@ -21,13 +21,6 @@ from tkinter import *
 
 Test_mode = True
 
-dir_set_by_button = False
-
-
-def enable_dir_set_by_button():
-    global dir_set_by_button
-    dir_set_by_button = True
-
 
 def tell_me_which_directory():
     if len(sys.argv) > 1:
@@ -39,15 +32,12 @@ def tell_me_which_directory():
         else:
             print("This isn't Kev's Home PC, must be laptop, so setting test default directory accordingly\n")
             direc = r"C:\KP Python\deduper\test"
-    if dir_set_by_button:
-        direc = get_dir_from_gui()
+    try:
+        if gui.dir_set_by_button:
+            direc = gui.get_dir_from_gui()
+    except:
+        print('KP Error - gui.dir_set_by_button is not found')
     return direc
-
-
-def get_dir_from_gui():
-    new_dir = gui.entryDir.get()
-    print('Attempting to set new dir')
-    return new_dir
 
 
 def get_video_filename(fname, folname, abspath):
@@ -96,11 +86,6 @@ def main_fn():
             sys.exit()
 
 
-def main_triggered_from_button():
-    enable_dir_set_by_button()
-    main_fn()
-
-
 class Gui:
     def __init__(self, root):
         self.text_box = Text(root, height=30, width=120)
@@ -115,8 +100,21 @@ class Gui:
         self.entryDir.grid(row=2,column=2)
 
         self.quitButton = Button(root,text='Quit', font='Arial 16',command=quit, fg='red', bg='gray').grid(row=4,column=1)
-        self.goButton = Button(root,text='Go', font='Arial 24 bold',command=main_triggered_from_button, fg='green', bg='gray').grid(row=4,column=3)
+        self.goButton = Button(root,text='Go', font='Arial 24 bold',command=self.main_triggered_from_button, fg='green', bg='gray').grid(row=4,column=3)
 
+        self.dir_set_by_button = False
+
+    def enable_dir_set_by_button(self):
+        self.dir_set_by_button = True
+
+    def main_triggered_from_button(self):
+        self.enable_dir_set_by_button()
+        main_fn()
+
+    def get_dir_from_gui(self):
+        self.new_dir = gui.entryDir.get()
+        print('Attempting to set new dir')
+        return self.new_dir
 
     def output(self, text):
         self.text_box.insert(END, '{}\n'.format(text))
@@ -133,5 +131,4 @@ dir_text = str(directory)   # converts directory path to text for use by tkinter
 
 root = Tk().title('Deduper')
 gui = Gui(root)
-
 mainloop()
