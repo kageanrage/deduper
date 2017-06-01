@@ -4,8 +4,7 @@
 
 
 # TO DO:
-# I've created a 'Don't delete' button. Need to remove index from outside of class and subsequent Output line, and
-# combine into Gui class.
+# I've created a 'Don't delete' button.
 # Next create a 'delete' button which does much the same as 'Don't Delete'.. but deletes the file. I have shell of
 # function already created - delete_file() which will also need to be moved to class Gui
 
@@ -17,7 +16,7 @@ import send2trash
 from tkinter import *
 
 
-Test_mode = True
+Test_mode = False
 
 
 def tell_me_which_directory():
@@ -104,20 +103,12 @@ def main_alt():     # this is the new 'Main' function for when using GUI
                 # gui.output('File to delete is {}, size is {}'.format(fname_sorted[i], os.path.getsize(fname_sorted[i])))
                 gui.to_delete.append(fname_sorted[i])   # add non-largest videos to the 'To Delete' list
     # gui.output(gui.to_delete)
-    index = 0   # duplicate index - roll together with self.index in Gui class
-    gui.output("(output from outside class) Press 'DEL' to delete File #{} - {}".format(index+1, gui.to_delete[index]))   # duplicate output, combine into Gui class
+    gui.output("(output from outside class) Press 'DEL' to delete File #{} - {}".format(gui.index+1, gui.to_delete[gui.index]))   # Displays first file only
 
 
 
 
-"""     # need to adjust this to become my delete method
-def delete_file():
-    if not Test_mode:
-        gui.output('Sending to Recycle Bin: {}'.format(fname_sorted[i]))
-        send2trash.send2trash(fname_sorted[i])
-    else:
-        gui.output('Pretending to delete file: {}'.format(fname_sorted[i]))  # INSERT CODE TO DELETE FILE
-"""
+
 
 
 class Gui:
@@ -139,15 +130,24 @@ class Gui:
 
         self.quitButton = Button(root,text='Quit', font='Arial 16',command=quit, fg='red', bg='gray').grid(row=4,column=1)
         self.goButton = Button(root,text='Go', font='Arial 24 bold',command=self.main_triggered_from_button, fg='green', bg='gray').grid(row=4,column=3)
-        self.dontdeleteButton = Button(root, text='Dont delete', font='Arial 16', command=self.dont_delete, fg='yellow', bg='gray').grid(row=4, column=2)
+        self.dontdeleteButton = Button(root, text='Dont delete', font='Arial 16', command=self.dont_delete, fg='yellow', bg='gray').grid(row=3, column=4)
+        self.deleteButton = Button(root, text='DELETE', font='Arial 16', command=self.delete_file, fg='red', bg='gray').grid(row=4, column=4)
 
         self.dir_set_by_button = False
 
     def dont_delete(self):    # don't delete, just move to the next file
+        gui.output("Ignoring File #{} - {}".format(self.index+1, self.to_delete[self.index]))
         self.index += 1
-        gui.output("Ignoring File #{} - {}".format(self.index, self.to_delete[self.index-1]))
         gui.output("Do you want to delete File #{} - {}?".format(self.index+1, self.to_delete[self.index]))
 
+    def delete_file(self):
+        if not Test_mode:
+            gui.output("Sending to Recycle Bin #{} - {}".format(self.index+1, self.to_delete[self.index]))
+            send2trash.send2trash(self.to_delete[self.index])
+        else:
+            gui.output("Test mode - pretending to delete #{} - {}".format(self.index+1, self.to_delete[self.index]))
+        self.index += 1
+        gui.output("Do you want to delete File #{} - {}?".format(self.index+1, self.to_delete[self.index]))
 
     def enable_dir_set_by_button(self):
         self.dir_set_by_button = True
