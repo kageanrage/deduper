@@ -1,17 +1,15 @@
 #! python3
 # Deduper.py - Script to crawl through Movies directory, notify if multiple video files and prompt to delete all but
-# the largest of the files found in each directory
-
-# State of this program - the GUI is only useful to select input directory - it doesn't then give any further control
-# and it seizes up, with control handled by the command prompt. Probably worthwhile continuing to try to solve, although
-# will mean that main_fn will need to be duplicated / overhauled so it can be controlled in an object oriented fashion.
-# I've tested outputting text to the GUI and it works fine - I need to work out how to run my program in bursts by pressing
-# buttons (which trigger functions - e.g. 'delete and show next file') instead of using console input
+# the largest of the files found in each directory. Ultimately can have CLI and GUI options.
 
 
 # TO DO:
-# show all text on GUI (using Output function) instead of in command prompt / console - this will require the ability
-#  to use buttons for 'Yes' or 'No' instead of command prompt
+# I've created a 'Don't delete' button. Need to remove index from outside of class and subsequent Output line, and
+# combine into Gui class.
+# Next create a 'delete' button which does much the same as 'Don't Delete'.. but deletes the file. I have shell of
+# function already created - delete_file() which will also need to be moved to class Gui
+
+# BUGS - I seem to have reached output capacity on my text box so have commented out some output
 
 
 import os
@@ -86,8 +84,48 @@ def main_fn():
             sys.exit()
 
 
+def main_alt():     # this is the new 'Main' function for when using GUI
+    directory = tell_me_which_directory()
+    gui.output('Directory = {}\n\n'.format(directory))
+    os.chdir(directory) # change cwd to the desired directory
+    abspath = os.path.abspath('.')  # define abspath
+    for folderName, subfolders, filenames in os.walk(directory):
+        movie_files_detected = []
+        for filename in filenames:
+            if get_video_filename(filename, folderName, abspath) != None:
+                movie_files_detected.append(get_video_filename(filename, folderName, abspath))
+        fname_sorted = sorted(movie_files_detected, key=os.path.getsize, reverse=True)
+        if len(fname_sorted) > 1:
+            # gui.output('\n\n\nMultiple video files detected in folder {}'.format(folderName))   #temp commented out as text box full
+            # gui.output("The largest video file in the folder, which we won't touch, is {}\n".format(fname_sorted[0]))
+            # gui.output('Potential files to delete are as follows:')
+
+            for i in range(1, len(fname_sorted)):
+                # gui.output('File to delete is {}, size is {}'.format(fname_sorted[i], os.path.getsize(fname_sorted[i])))
+                gui.to_delete.append(fname_sorted[i])   # add non-largest videos to the 'To Delete' list
+    # gui.output(gui.to_delete)
+    index = 0   # duplicate index - roll together with self.index in Gui class
+    gui.output("(output from outside class) Press 'DEL' to delete File #{} - {}".format(index+1, gui.to_delete[index]))   # duplicate output, combine into Gui class
+
+
+
+
+"""     # need to adjust this to become my delete method
+def delete_file():
+    if not Test_mode:
+        gui.output('Sending to Recycle Bin: {}'.format(fname_sorted[i]))
+        send2trash.send2trash(fname_sorted[i])
+    else:
+        gui.output('Pretending to delete file: {}'.format(fname_sorted[i]))  # INSERT CODE TO DELETE FILE
+"""
+
+
 class Gui:
     def __init__(self, root):
+
+        self.index = 0
+        self.to_delete = []
+
         self.text_box = Text(root, height=30, width=120)
         self.text_box.grid(row=5, column=2)
 
@@ -101,15 +139,23 @@ class Gui:
 
         self.quitButton = Button(root,text='Quit', font='Arial 16',command=quit, fg='red', bg='gray').grid(row=4,column=1)
         self.goButton = Button(root,text='Go', font='Arial 24 bold',command=self.main_triggered_from_button, fg='green', bg='gray').grid(row=4,column=3)
+        self.dontdeleteButton = Button(root, text='Dont delete', font='Arial 16', command=self.dont_delete, fg='yellow', bg='gray').grid(row=4, column=2)
 
         self.dir_set_by_button = False
+
+    def dont_delete(self):    # don't delete, just move to the next file
+        self.index += 1
+        gui.output("Ignoring File #{} - {}".format(self.index, self.to_delete[self.index-1]))
+        gui.output("Do you want to delete File #{} - {}?".format(self.index+1, self.to_delete[self.index]))
+
 
     def enable_dir_set_by_button(self):
         self.dir_set_by_button = True
 
     def main_triggered_from_button(self):
         self.enable_dir_set_by_button()
-        main_fn()
+        # main_fn()
+        main_alt()
 
     def get_dir_from_gui(self):
         self.new_dir = gui.entryDir.get()
