@@ -81,7 +81,7 @@ def main_fn():
 
 
 def main_alt():     # this is the new 'Main' function for when using GUI
-    gui.disable_go_button()
+
     direc = tell_me_which_directory()
     gui.output('Directory = {}\n\n'.format(direc))
     os.chdir(direc) # change cwd to the desired directory
@@ -101,15 +101,14 @@ def main_alt():     # this is the new 'Main' function for when using GUI
                 # gui.output('File to delete is {}, size is {}'.format(fname_sorted[i], os.path.getsize(fname_sorted[i])))
                 gui.to_delete.append(fname_sorted[i])   # add non-largest videos to the 'To Delete' list
     # gui.output(gui.to_delete)
-    gui.output("Press 'DEL' to delete File #{} - {}".format(gui.index+1, gui.to_delete[gui.index]))   # Displays first file only
-
+    # gui.output("Press 'DEL' to delete File #{} - {}".format(gui.index+1, gui.to_delete[gui.index]))   # Displays first file only
+    gui.show_next_file()
 
 class Gui:
     def __init__(self, root):
 
-        self.index = 0
+        self.index = -1
         self.to_delete = []
-        self.program_ended = False
 
         self.text_box = Text(root, height=30, width=120)
         self.text_box.grid(row=5, column=2)
@@ -131,11 +130,14 @@ class Gui:
         self.goButton = Button(root,text='Go', font='Arial 24 bold',command=self.main_triggered_from_button, fg='green', bg='gray')
         self.goButton.grid(row=4,column=3)
 
-        self.dontdeleteButton = Button(root, text='Dont delete', font='Arial 16', command=self.dont_delete, fg='yellow', bg='gray')
-        self.dontdeleteButton.grid(row=3, column=4)
+        self.dontdeleteButton = Button(root, text='Dont delete', font='Arial 16', command=self.dont_delete, fg='yellow', bg='gray', state='disabled')
+        self.dontdeleteButton.grid(row=3, column=2)
 
-        self.deleteButton = Button(root, text='DELETE', font='Arial 16', command=self.delete_file, fg='red', bg='gray')
-        self.deleteButton.grid(row=4, column=4)
+        self.deleteButton = Button(root, text='DELETE', font='Arial 16', command=self.delete_file, fg='red', bg='gray', state='disabled')
+        self.deleteButton.grid(row=4, column=2)
+
+        self.abortButton = Button(root, text='Abort', font='Arial 16', command=self.end_program, fg='red', bg='gray', state='disabled')
+        self.abortButton.grid(row=3, column=3)
 
         self.dir_set_by_button = False
 
@@ -164,6 +166,8 @@ class Gui:
 
     def main_triggered_from_button(self):
         self.enable_dir_set_by_button()
+        self.disable_go_button()
+        self.enable_all_buttons()
         main_alt()
 
     def get_dir_from_gui(self):
@@ -182,18 +186,30 @@ class Gui:
             self.end_program()
 
     def end_program(self):
-        self.output("All files processed. Press the 'Quit' button when ready")
-        self.program_ended = True
+        self.output("Program ended. Quit or change directory and go again")
         self.disable_all_buttons()
+        self.reset_stats()
+        self.enable_go_button()
 
     def disable_go_button(self):
         self.goButton.config(state='disabled')
 
+    def enable_go_button(self):
+        self.goButton.config(state='normal')
+
     def disable_all_buttons(self):
-        self.goButton.config(state='disabled')
         self.dontdeleteButton.config(state='disabled')
         self.deleteButton.config(state='disabled')
+        self.abortButton.config(state='disabled')
 
+    def enable_all_buttons(self):
+        self.dontdeleteButton.config(state='normal')
+        self.deleteButton.config(state='normal')
+        self.abortButton.config(state='normal')
+
+    def reset_stats(self):
+        self.index = 0
+        self.to_delete = []
 
 
 directory = tell_me_which_directory()   # determine directory
