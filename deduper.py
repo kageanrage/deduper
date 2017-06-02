@@ -155,7 +155,7 @@ class Gui:
         self.check_if_all_files_processed()
         self.index += 1
         try:
-            gui.output("Do you want to delete File #{} - {}?".format(self.index+1, self.to_delete[self.index]))
+            gui.output("\nDo you want to delete File #{} - {}?".format(self.index+1, self.to_delete[self.index]))
         except IndexError:
             print('Show_next_file() Index Error: Index out of range (program should now be complete)')
 
@@ -182,7 +182,7 @@ class Gui:
             self.end_program()
 
     def end_program(self):
-        self.output('All files processed')
+        self.output("All files processed. Press the 'Quit' button when ready")
         self.program_ended = True
         self.disable_all_buttons()
 
