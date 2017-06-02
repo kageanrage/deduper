@@ -2,10 +2,9 @@
 # Deduper.py - Script to crawl through Movies directory, notify if multiple video files and prompt to delete all but
 # the largest of the files found in each directory. Ultimately can have CLI and GUI options.
 
-
 # TO DO:
 # add message 'Process Complete' when all files have been processed
-# grey out buttons when not useable
+# grey out buttons when not usable
 # I seem to have reached output capacity on my text box so have commented out some output
 # refactor where sensible
 
@@ -13,7 +12,6 @@
 import os
 import send2trash
 from tkinter import *
-
 
 Test_mode = False
 
@@ -105,11 +103,6 @@ def main_alt():     # this is the new 'Main' function for when using GUI
     gui.output("(output from outside class) Press 'DEL' to delete File #{} - {}".format(gui.index+1, gui.to_delete[gui.index]))   # Displays first file only
 
 
-
-
-
-
-
 class Gui:
     def __init__(self, root):
 
@@ -136,8 +129,7 @@ class Gui:
 
     def dont_delete(self):    # don't delete, just move to the next file
         gui.output("Ignoring File #{} - {}".format(self.index+1, self.to_delete[self.index]))
-        self.index += 1
-        gui.output("Do you want to delete File #{} - {}?".format(self.index+1, self.to_delete[self.index]))
+        self.show_next_file()
 
     def delete_file(self):
         if not Test_mode:
@@ -145,6 +137,9 @@ class Gui:
             send2trash.send2trash(self.to_delete[self.index])
         else:
             gui.output("Test mode - pretending to delete #{} - {}".format(self.index+1, self.to_delete[self.index]))
+        self.show_next_file()
+
+    def show_next_file(self):
         self.index += 1
         gui.output("Do you want to delete File #{} - {}?".format(self.index+1, self.to_delete[self.index]))
 
@@ -171,9 +166,9 @@ class Gui:
 print('Hello, this script will crawl through the directory and sub-dirs, notify if multiple video files found in one '
       'dir, and prompt to delete each of them, excluding the largest one\n\n\n')
 
-directory = tell_me_which_directory()
+directory = tell_me_which_directory()   # determine directory
 dir_text = str(directory)   # converts directory path to text for use by tkinter 'entryDir' as default text
 
-root = Tk().title('Deduper')
-gui = Gui(root)
-mainloop()
+root = Tk().title('Deduper')    # establish Gui object with tkinter
+gui = Gui(root)                 # establish Gui object with tkinter
+mainloop()                      # fundamental tkinter loop
