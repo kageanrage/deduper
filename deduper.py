@@ -3,17 +3,17 @@
 # the largest of the files found in each directory. Ultimately can have CLI and GUI options.
 
 # TO DO:
-# add message 'Process Complete' when all files have been processed
-# grey out buttons when not usable
-# I seem to have reached output capacity on my text box so have commented out some output
-# refactor where sensible
+# establish how to run from CLI or GUI
+# Fix output capacity issue on text box
+# refactor where sensible - e.g. move output statement for first file into class
+# make it pretty
 
 
 import os
 import send2trash
 from tkinter import *
 
-Test_mode = False
+Test_mode = True
 
 
 def tell_me_which_directory():
@@ -81,26 +81,27 @@ def main_fn():
 
 
 def main_alt():     # this is the new 'Main' function for when using GUI
-    directory = tell_me_which_directory()
-    gui.output('Directory = {}\n\n'.format(directory))
-    os.chdir(directory) # change cwd to the desired directory
+    gui.disable_go_button()
+    direc = tell_me_which_directory()
+    gui.output('Directory = {}\n\n'.format(direc))
+    os.chdir(direc) # change cwd to the desired directory
     abspath = os.path.abspath('.')  # define abspath
-    for folderName, subfolders, filenames in os.walk(directory):
+    for folderName, subfolders, filenames in os.walk(direc):
         movie_files_detected = []
         for filename in filenames:
             if get_video_filename(filename, folderName, abspath) != None:
                 movie_files_detected.append(get_video_filename(filename, folderName, abspath))
         fname_sorted = sorted(movie_files_detected, key=os.path.getsize, reverse=True)
         if len(fname_sorted) > 1:
-            # gui.output('\n\n\nMultiple video files detected in folder {}'.format(folderName))   #temp commented out as text box full
-            # gui.output("The largest video file in the folder, which we won't touch, is {}\n".format(fname_sorted[0]))
+            gui.output('\n\n\nMultiple video files detected in folder {}'.format(folderName))   #temp commented out as text box full
+            gui.output("The largest video file in the folder, which we won't touch, is {}\n".format(fname_sorted[0]))
             # gui.output('Potential files to delete are as follows:')
 
             for i in range(1, len(fname_sorted)):
                 # gui.output('File to delete is {}, size is {}'.format(fname_sorted[i], os.path.getsize(fname_sorted[i])))
                 gui.to_delete.append(fname_sorted[i])   # add non-largest videos to the 'To Delete' list
     # gui.output(gui.to_delete)
-    gui.output("(output from outside class) Press 'DEL' to delete File #{} - {}".format(gui.index+1, gui.to_delete[gui.index]))   # Displays first file only
+    gui.output("Press 'DEL' to delete File #{} - {}".format(gui.index+1, gui.to_delete[gui.index]))   # Displays first file only
 
 
 class Gui:
@@ -113,20 +114,28 @@ class Gui:
         self.text_box = Text(root, height=30, width=120)
         self.text_box.grid(row=5, column=2)
 
-        self.labelHeading = Label(root, text='Deduper', font = 'Arial 24 bold', fg='blue', bg='gray').grid(row=0, column=2)
-        self.labelDescription = Label(root, text='Deletes all but the largest video file in each sub-dir', font='Arial 16', fg='blue', bg='gray').grid(row=1, column=2)
+        self.labelHeading = Label(root, text='Deduper', font = 'Arial 24 bold', fg='blue', bg='gray')
+        self.labelHeading.grid(row=0, column=2)
+        self.labelDescription = Label(root, text='Deletes all but the largest video file in each sub-dir', font='Arial 16', fg='blue', bg='gray')
+        self.labelDescription.grid(row=1, column=2)
 
-        self.labelDir = Label(root, text='Directory', font='Arial 16', fg='blue', bg='gray').grid(row=2, column=1)
+        self.labelDir = Label(root, text='Directory', font='Arial 16', fg='blue', bg='gray')
+        self.labelDir.grid(row=2, column=1)
         self.entryDir = Entry(root, width=50)
         self.entryDir.insert(10, dir_text)
         self.entryDir.grid(row=2,column=2)
 
-        self.quitButton = Button(root,text='Quit', font='Arial 16',command=quit, fg='red', bg='gray').grid(row=4,column=1)
+        self.quitButton = Button(root,text='Quit', font='Arial 16',command=quit, fg='red', bg='gray')
+        self.quitButton.grid(row=4,column=1)
 
-        if not self.program_ended:  # THIS APPROACH NEEDS CHANGING - DOESN'T REMOVE BUTTONS WHEN PROGRAM ENDS
-            self.goButton = Button(root,text='Go', font='Arial 24 bold',command=self.main_triggered_from_button, fg='green', bg='gray').grid(row=4,column=3)
-            self.dontdeleteButton = Button(root, text='Dont delete', font='Arial 16', command=self.dont_delete, fg='yellow', bg='gray').grid(row=3, column=4)
-            self.deleteButton = Button(root, text='DELETE', font='Arial 16', command=self.delete_file, fg='red', bg='gray').grid(row=4, column=4)
+        self.goButton = Button(root,text='Go', font='Arial 24 bold',command=self.main_triggered_from_button, fg='green', bg='gray')
+        self.goButton.grid(row=4,column=3)
+
+        self.dontdeleteButton = Button(root, text='Dont delete', font='Arial 16', command=self.dont_delete, fg='yellow', bg='gray')
+        self.dontdeleteButton.grid(row=3, column=4)
+
+        self.deleteButton = Button(root, text='DELETE', font='Arial 16', command=self.delete_file, fg='red', bg='gray')
+        self.deleteButton.grid(row=4, column=4)
 
         self.dir_set_by_button = False
 
@@ -145,7 +154,10 @@ class Gui:
     def show_next_file(self):
         self.check_if_all_files_processed()
         self.index += 1
-        gui.output("Do you want to delete File #{} - {}?".format(self.index+1, self.to_delete[self.index]))
+        try:
+            gui.output("Do you want to delete File #{} - {}?".format(self.index+1, self.to_delete[self.index]))
+        except IndexError:
+            print('Show_next_file() Index Error: Index out of range (program should now be complete)')
 
     def enable_dir_set_by_button(self):
         self.dir_set_by_button = True
@@ -173,22 +185,22 @@ class Gui:
         self.output('All files processed')
         self.program_ended = True
         self.disable_all_buttons()
-        # could grey out all buttons except 'Quit' at this stage?
 
     def disable_go_button(self):
-        self.goButton.config(state=DISABLED)
+        self.goButton.config(state='disabled')
 
     def disable_all_buttons(self):
-        self.goButton.config(state=DISABLED)
-        self.dontdeleteButton.config(state=DISABLED)
-        self.deleteButton.config(state=DISABLED)
+        self.goButton.config(state='disabled')
+        self.dontdeleteButton.config(state='disabled')
+        self.deleteButton.config(state='disabled')
 
-print('Hello, this script will crawl through the directory and sub-dirs, notify if multiple video files found in one '
-      'dir, and prompt to delete each of them, excluding the largest one\n\n\n')
+
 
 directory = tell_me_which_directory()   # determine directory
 dir_text = str(directory)   # converts directory path to text for use by tkinter 'entryDir' as default text
 
 root = Tk().title('Deduper')    # establish Gui object with tkinter
 gui = Gui(root)                 # establish Gui object with tkinter
+gui.output('Hello, this script will crawl through the directory and sub-dirs, notify if multiple video files found in'
+           ' one dir, and prompt to delete each of them, excluding the largest one\n\n\n')
 mainloop()                      # fundamental tkinter loop
