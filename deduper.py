@@ -108,6 +108,7 @@ class Gui:
 
         self.index = 0
         self.to_delete = []
+        self.program_ended = False
 
         self.text_box = Text(root, height=30, width=120)
         self.text_box.grid(row=5, column=2)
@@ -121,9 +122,11 @@ class Gui:
         self.entryDir.grid(row=2,column=2)
 
         self.quitButton = Button(root,text='Quit', font='Arial 16',command=quit, fg='red', bg='gray').grid(row=4,column=1)
-        self.goButton = Button(root,text='Go', font='Arial 24 bold',command=self.main_triggered_from_button, fg='green', bg='gray').grid(row=4,column=3)
-        self.dontdeleteButton = Button(root, text='Dont delete', font='Arial 16', command=self.dont_delete, fg='yellow', bg='gray').grid(row=3, column=4)
-        self.deleteButton = Button(root, text='DELETE', font='Arial 16', command=self.delete_file, fg='red', bg='gray').grid(row=4, column=4)
+
+        if not self.program_ended:  # THIS APPROACH NEEDS CHANGING - DOESN'T REMOVE BUTTONS WHEN PROGRAM ENDS
+            self.goButton = Button(root,text='Go', font='Arial 24 bold',command=self.main_triggered_from_button, fg='green', bg='gray').grid(row=4,column=3)
+            self.dontdeleteButton = Button(root, text='Dont delete', font='Arial 16', command=self.dont_delete, fg='yellow', bg='gray').grid(row=3, column=4)
+            self.deleteButton = Button(root, text='DELETE', font='Arial 16', command=self.delete_file, fg='red', bg='gray').grid(row=4, column=4)
 
         self.dir_set_by_button = False
 
@@ -140,6 +143,7 @@ class Gui:
         self.show_next_file()
 
     def show_next_file(self):
+        self.check_if_all_files_processed()
         self.index += 1
         gui.output("Do you want to delete File #{} - {}?".format(self.index+1, self.to_delete[self.index]))
 
@@ -148,7 +152,6 @@ class Gui:
 
     def main_triggered_from_button(self):
         self.enable_dir_set_by_button()
-        # main_fn()
         main_alt()
 
     def get_dir_from_gui(self):
@@ -162,6 +165,23 @@ class Gui:
         print('Attempting to OUTPUT: {}\n'.format(text))
         print(text)
 
+    def check_if_all_files_processed(self):
+        if self.index >= len(self.to_delete)-1:
+            self.end_program()
+
+    def end_program(self):
+        self.output('All files processed')
+        self.program_ended = True
+        self.disable_all_buttons()
+        # could grey out all buttons except 'Quit' at this stage?
+
+    def disable_go_button(self):
+        self.goButton.config(state=DISABLED)
+
+    def disable_all_buttons(self):
+        self.goButton.config(state=DISABLED)
+        self.dontdeleteButton.config(state=DISABLED)
+        self.deleteButton.config(state=DISABLED)
 
 print('Hello, this script will crawl through the directory and sub-dirs, notify if multiple video files found in one '
       'dir, and prompt to delete each of them, excluding the largest one\n\n\n')
