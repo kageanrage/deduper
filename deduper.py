@@ -4,11 +4,10 @@
 
 
 # TO DO:
-# I've created a 'Don't delete' button.
-# Next create a 'delete' button which does much the same as 'Don't Delete'.. but deletes the file. I have shell of
-# function already created - delete_file() which will also need to be moved to class Gui
-
-# BUGS - I seem to have reached output capacity on my text box so have commented out some output
+# add message 'Process Complete' when all files have been processed
+# grey out buttons when not useable
+# I seem to have reached output capacity on my text box so have commented out some output
+# refactor where sensible
 
 
 import os
